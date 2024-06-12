@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management</title>
+    <style>
+        /* Add your CSS styles here */
+    </style>
+</head>
+<body>
+    <h1 align="center">Event Management</h1>
+    <h2>Get Events</h2>
+    <button>
+        <a href="http://localhost:8080/getEvents">Get All Events</a>
+    </button>
+    <h2>Add Event</h2>
+    <form id="createEventForm">
+        <label for="summary">Summary:</label><br>
+        <input type="text" id="summary" name="summary"><br>
+        <label for="location">Location:</label><br>
+        <input type="text" id="location" name="location"><br>
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="description"></textarea><br>
+        <label for="startDateTime">Start Date and Time:</label><br>
+        <input type="text" id="startDateTime" name="startDateTime"><br>
+        <label for="endDateTime">End Date and Time:</label><br>
+        <input type="text" id="endDateTime" name="endDateTime"><br>
+        <button type="button" onclick="createNewEvent()">Create Event</button>
+    </form>
+    <br>
+    <h2>Edit Event</h2>
+    <form id="editEventForm">
+        <label for="EventID">Event ID:</label><br>
+        <input type="text" id="EditEventID" name="EventID"><br>
+        <label for="summary">Summary:</label><br>
+        <input type="text" id="EditSummary" name="summary"><br>
+        <label for="location">Location:</label><br>
+        <input type="text" id="EditLocation" name="location"><br>
+        <label for="description">Description:</label><br>
+        <textarea id="EditDescription" name="description"></textarea><br>
+        <label for="startDateTime">Start Date and Time:</label><br>
+        <input type="text" id="EditStartDateTime" name="startDateTime"><br>
+        <label for="endDateTime">End Date and Time:</label><br>
+        <input type="text" id="EditEndDateTime" name="endDateTime"><br>
+        <button type="button" onclick="editEvent()">Edit Event</button>
+    </form>
+    <br>
+    <h2>Delete Event</h2>
+    <form id="deleteEventForm">
+        <label for="EventID">Event ID:</label><br>
+        <input type="text" id="DeleteEventID" name="EventID"><br>
+        <button type="button" onclick="deleteEvent()">Delete Event</button>
+    </form>
+    <div id="eventResponse"></div>
+
+    <script>
+        function createNewEvent() {
+            var summary = document.getElementById("summary").value;
+            var location = document.getElementById("location").value;
+            var description = document.getElementById("description").value;
+            var startDateTime = document.getElementById("startDateTime").value;
+            var endDateTime = document.getElementById("endDateTime").value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/createEvent?summary=" + summary + "&location=" + location + "&description=" + description + "&startDate=" + startDateTime + "&endDate=" + endDateTime, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        document.getElementById("eventResponse").innerText = xhr.responseText;
+                    } else {
+                        document.getElementById("eventResponse").innerText = "Error: " + xhr.responseText;
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        function editEvent() {
+        	var eventId = document.getElementById("EditEventID").value;
+            var summary = document.getElementById("EditSummary").value;
+            var location = document.getElementById("EditLocation").value;
+            var description = document.getElementById("EditDescription").value;
+            var startDateTime = document.getElementById("EditStartDateTime").value;
+            var endDateTime = document.getElementById("EditEndDateTime").value;
+
+            var params = [];
+            if (summary) params.push("summary=" + encodeURIComponent(summary));
+            if (location) params.push("location=" + encodeURIComponent(location));
+            if (description) params.push("description=" + encodeURIComponent(description));
+            if (startDateTime) params.push("startDateTime=" + encodeURIComponent(startDateTime));
+            if (endDateTime) params.push("endDateTime=" + encodeURIComponent(endDateTime));
+
+            var queryString = params.join("&");
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/editEvent/" + eventId + "?" + queryString, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        document.getElementById("eventResponse").innerText = xhr.responseText;
+                    } else {
+                        document.getElementById("eventResponse").innerText = "Error: " + xhr.responseText;
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        function deleteEvent() {
+            var eventId = document.getElementById("DeleteEventID").value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/deleteEvent/" + eventId, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        document.getElementById("eventResponse").innerText = xhr.responseText;
+                    } else {
+                        document.getElementById("eventResponse").innerText = "Error: " + xhr.responseText;
+                    }
+                }
+            };
+            xhr.send();
+        }
+    </script>
+</body>
+</html>

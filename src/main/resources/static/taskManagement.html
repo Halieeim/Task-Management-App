@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management</title>
+    <style>
+        /* Add your CSS styles here */
+    </style>
+</head>
+<body>
+    <h1 align="center">Task Management</h1>
+    <h2>Get Tasks</h2>
+    <button>
+        <a href="http://localhost:8080/getTasks">Get All Tasks</a>
+    </button>
+    <h2>Create Task</h2>
+    <form id="taskForm">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <label for="notes">Notes:</label><br>
+        <textarea id="notes" name="notes"></textarea><br>
+        <label for="due">Due Date and Time:</label><br>
+        <input type="text" id="due" name="due"><br>
+        <button type="button" onclick="createTask()">Create Task</button>
+    </form>
+    <br>
+    <h2>Edit Task</h2>
+    <form id="editTaskForm">
+    	<label for="EditTaskId">Task ID:</label><br>
+    	<input type="text" id="EditTaskId" name="title"><br>
+        <label for="Edittitle">Title:</label><br>
+        <input type="text" id="Edittitle" name="title"><br>
+        <label for="Editnotes">Notes:</label><br>
+        <textarea id="Editnotes" name="notes"></textarea><br>
+        <label for="Editdue">Due Date and Time:</label><br>
+        <input type="text" id="Editdue" name="due"><br>
+        <button type="button" onclick="editTask()">Edit Task</button>
+    </form>
+    <br>
+    <h2>Delete Task</h2>
+    <form id="editTaskForm">
+    	<label for="TaskId">Task ID:</label><br>
+    	<input type="text" id="taskId" name="title"><br>
+        <button type="button" onclick="deleteTask()">Delete Task</button>
+    </form>
+    <div id="taskResponse"></div>
+
+    <script>
+
+        // Function to create a new task
+        function createTask() {
+            var title = document.getElementById("title").value;
+            var notes = document.getElementById("notes").value;
+            var due = document.getElementById("due").value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/createTask?title=" + title + "&notes=" + notes + "&due=" + due, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        document.getElementById("taskResponse").innerText = xhr.responseText;
+                    } else {
+                        document.getElementById("taskResponse").innerText = "Error: " + xhr.responseText;
+                    }
+                }
+            };
+            xhr.send();	
+        }
+
+        // Function to delete a task
+        function deleteTask() {
+            var taskId = document.getElementById("taskId").value;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/deleteTask/" + taskId, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        document.getElementById("taskResponse").innerText = xhr.responseText;
+                    } else {
+                        document.getElementById("taskResponse").innerText = "Error: " + xhr.responseText;
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        // Function to edit a task
+        function editTask() {
+            var taskId = document.getElementById("EditTaskId").value;
+            var newTitle = document.getElementById("Edittitle").value;
+            var newNotes = document.getElementById("Editnotes").value;
+            var newDue = document.getElementById("Editdue").value;
+            
+            var params = [];
+            if (newTitle) params.push("title=" + encodeURIComponent(newTitle));
+            if (newNotes) params.push("notes=" + encodeURIComponent(newNotes));
+            if (newDue) params.push("due=" + encodeURIComponent(newDue));
+
+            var queryString = params.join("&");
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/editTask/" + taskId + "?" + queryString, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        document.getElementById("taskResponse").innerText = xhr.responseText;
+                    } else {
+                        document.getElementById("taskResponse").innerText = "Error: " + xhr.responseText;
+                    }
+                }
+            };
+            xhr.send();
+        }
+    </script>
+</body>
+</html>
