@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,16 +23,7 @@ public class CalendarService {
 	@Autowired
     private EventRepository eventRepository;
 
-//    @Cacheable("events")
-//    public List<Events> getAllEvents() {
-//        return eventRepository.findAll();
-//    }
-//    @Cacheable("events")
-//    public Optional<Events> getEventById(String eventId) {
-//        return eventRepository.findById(eventId);
-//    }
-
-//    @CacheEvict(value = "events", allEntries = true)
+    @CacheEvict(value = "events", allEntries = true)
     public com.ropulva.task.calendar.events.Events addEventDB(com.ropulva.task.calendar.events.Events event) {
     	boolean exists = eventRepository.existsById(event.getId());
     	if(exists) {
@@ -42,7 +35,7 @@ public class CalendarService {
         return eventRepository.save(event);
     }
 
-//    @CacheEvict(value = "events", allEntries = true)
+    @CacheEvict(value = "events", allEntries = true)
     public void deleteEventDB(String eventId) {
     	boolean exists = eventRepository.existsById(eventId);
     	if(!exists) {
@@ -51,7 +44,7 @@ public class CalendarService {
         eventRepository.deleteById(eventId);
     }
 
-//    @CacheEvict(value = "events", allEntries = true)
+    @CacheEvict(value = "events", allEntries = true)
     @Transactional
     public void updateEventDB(String eventId, String summary, String description, String location, LocalDateTime startTime, LocalDateTime endTime) {
     	com.ropulva.task.calendar.events.Events event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalStateException("Event with id " + eventId + " does not exist."));
@@ -84,6 +77,7 @@ public class CalendarService {
         }
     }
 	
+    @CacheEvict(value = "events", allEntries = true)
     public String addEvent(String summary, String location, String description, String startDateTime, String endDateTime) throws Exception {
         Calendar service = GoogleCalendarConfig.getCalendarService();
 
@@ -116,6 +110,7 @@ public class CalendarService {
         return "Event created: " + createdEvent.getHtmlLink();
     }
     
+    @CacheEvict(value = "events", allEntries = true)
     public String deleteEvent(String eventId) throws Exception {
         Calendar service = GoogleCalendarConfig.getCalendarService();
         service.events().delete("primary", eventId).execute();
@@ -123,6 +118,8 @@ public class CalendarService {
         deleteEventDB(eventId);
         return "Event deleted";
     }
+    
+    @CacheEvict(value = "events", allEntries = true)
     @Transactional
     public String editEvent(String eventId, String summary, String location, String description, String startDateTime, String endDateTime) throws Exception {
         Calendar service = GoogleCalendarConfig.getCalendarService();
@@ -157,6 +154,7 @@ public class CalendarService {
         return "Event updated: " + updatedEvent.getHtmlLink();
     }
 
+    @Cacheable("events")
     public List<Event> getEvents() throws Exception {
         Calendar service = GoogleCalendarConfig.getCalendarService();
         DateTime now = new DateTime(System.currentTimeMillis());

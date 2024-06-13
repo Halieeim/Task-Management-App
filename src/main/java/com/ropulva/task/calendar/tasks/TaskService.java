@@ -8,6 +8,8 @@ import com.ropulva.task.calendar.configurations.GoogleTasksConfig;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,6 +20,7 @@ public class TaskService {
 	@Autowired
     private TaskRepository taskRepository;
 	
+	@CacheEvict(value = "tasks", allEntries = true)
     public String addTask(String title, String notes, String due) throws Exception {
         Tasks service = GoogleTasksConfig.getTasksService();
         Task task = new Task();
@@ -36,6 +39,7 @@ public class TaskService {
         return "Task created: " + result.getTitle();
     }
 
+	@CacheEvict(value = "tasks", allEntries = true)
     public String deleteTask(String taskId) throws Exception {
         Tasks service = GoogleTasksConfig.getTasksService();
         service.tasks().delete("@default", taskId).execute();
@@ -46,6 +50,7 @@ public class TaskService {
         return "Task deleted";
     }
     
+	@CacheEvict(value = "tasks", allEntries = true)
     @Transactional
     public String editTask(String taskId, String title, String notes, String due) throws Exception {
         Tasks service = GoogleTasksConfig.getTasksService();
@@ -74,6 +79,7 @@ public class TaskService {
         return "Task updated: " + updatedTask.getTitle();
     }
 
+	@Cacheable("tasks")
     public List<Task> getTasks() throws Exception {
         Tasks service = GoogleTasksConfig.getTasksService();
         com.google.api.services.tasks.model.Tasks tasks = service.tasks().list("@default").execute();
